@@ -116,9 +116,9 @@ int main() {
         "            --------------           ",
         "               -------               ",
         "                 ---                 ",
-        "_____________",
+        "_____________________________________",
         "|              TRUNFO               |",
-        "|_____________|"
+        "|___________________________________|"
     };
     for (control.i = 0; control.i < 10; control.i++) {
         printf("%s\n", textArt[control.i]);
@@ -133,7 +133,6 @@ int main() {
             printf("%s\n", label[3]);
             scanf(" %c", &card.state);        
             if ((trycast(card.state, int) >= 65) && (trycast(card.state, int) <= 72)) {
-                printf("\a%s\n", label[4]);
                 printf("\a%s\n", label[6]);
 
                 int code = 0;
@@ -145,37 +144,32 @@ int main() {
                     card.code[2] = '0' + code;
                     card.code[3] = '\0';
 
-                    printf("\a%s\n", label[4]);
                     printf("\a%s\n", label[7]);
                     scanf(" %499[^\n]", card.city);
 
                     if (_strlen(card.city) > 0) {
-                        printf("\a%s\n", label[4]);
                         printf("\a%s\n", label[8]);
                         scanf("%d", &card.population);
 
                         if (card.population >= 0) {
-                            printf("\a%s\n", label[4]);
                             printf("\a%s\n", label[9]);
                             scanf("%f", &card.area);
 
                             if (card.area >= 0) {
-                                printf("\a%s\n", label[4]);
                                 printf("\a%s\n", label[10]);
                                 scanf("%f", &card.pib);
 
                                 if (card.pib >= 0) {
-                                    printf("\a%s\n", label[4]);
                                     printf("\a%s\n", label[11]);
                                     scanf("%d", &card.points);
 
                                     if (card.points >= 0) {
-                                        printf("\a%s\n", label[4]);
                                         card.densp = (card.area > 0.0f) ? ((float)card.population / card.area) : 0.0f;
                                         card.pibcapt = (card.population > 0) ? (card.pib / card.population) : 0.0f;
                                         
                                         if (count < MAX_CARDS) {
                                             push(cards, &count, card, MAX_CARDS);
+                                            printf("\a%s\n", label[4]);
                                         }
                                         
                                         if (count == MAX_CARDS)
@@ -269,7 +263,7 @@ void compare(struct tcard value1, struct tcard value2, int *option) {
         case 5:
             if (value1.pibcapt > value2.pibcapt) _pCard(value1);
             else if (value2.pibcapt > value1.pibcapt) _pCard(value2);
-            else printf("Empate no PIB per capita.\n");
+            else printf("%s\n", label[21]);
             break;                                 
         default:
             break;
