@@ -22,7 +22,7 @@
         Sei que a proposta seria utilizar os tipos especificos de loops, mas coloquei no codigo os conceitos,
         mesmo que não utilizados diretamente
         Cuidado com o movimento do cavalo.
-        Pois ele corresponde a posição logo movimento eixo (4,2) da posição inicial.
+        Pois ele corresponde a posição inicial de (3,0).
         
     Espero que gostem! :D
 */
