@@ -21,6 +21,8 @@
     Atenção:
         Sei que a proposta seria utilizar os tipos especificos de loops, mas coloquei no codigo os conceitos,
         mesmo que não utilizados diretamente
+        Cuidado com o movimento do cavalo.
+        Pois ele corresponde a posição logo movimento eixo (4,2) da posição inicial.
         
     Espero que gostem! :D
 */
@@ -42,7 +44,8 @@ char label[20][200]              = {
                                     "Gostaria de pintar o tabuleiro?\n",
                                     "Visualização do tabuleiro\n",
                                     "Para visualizar o tabuleiro 1:\n",
-                                    "Não há área útil para mover a peça de acordo com seu tipo\n"
+                                    "Não há área útil para mover a peça de acordo com seu tipo\n",
+                                    "Para mover o cavalo: 4\n"
 };
 char _artQueen[20][20]           = {
                                     "____________",
@@ -82,6 +85,18 @@ char _artTower[20][20]           = {
                                     "| ||||||||| |",
                                     "____________",
                                 };
+char _artHorse[20][20]           = {
+                                    "____________",
+                                    "|   _$$Dl   |",
+                                    "| gr* O $   |",
+                                    "| RR_MMMM   |",
+                                    "|    ####   |",
+                                    "|   #####   |",
+                                    "|  ######   |",
+                                    "| ///////// |",
+                                    "| ||||||||| |",
+                                    "____________",
+                                };                                
 char _artBlank[20][20]           = {
                                     "____________",
                                     "|          |",
@@ -111,8 +126,8 @@ struct action {
 
 // Prototipos
 void movePiece(int board[8][8], struct piece *p, short int *newX, short int *newY);
-void placeAllPieces(int board[8][8], struct piece *queen, struct piece *bishop, struct piece *tower);
-void printBoard(int board[8][8], struct piece *queen, struct piece *bishop, struct piece *tower);
+void placeAllPieces(int board[8][8], struct piece *queen, struct piece *bishop, struct piece *tower, struct piece *horse);
+void printBoard(int board[8][8], struct piece *queen, struct piece *bishop, struct piece *tower, struct piece *horse);
 short int isValidMove(struct piece *p, short int newX, short int newY);
 short int sabs(short int d);
 void exemploFor();
@@ -123,12 +138,13 @@ void exemploDoWhile();
 int main () {
     int board[8][8]         = {};
     struct action   main;
-    struct piece    queen   = {1, 0, 0, _artQueen};
-    struct piece    bishop  = {2, 0, 0, _artBishop};
-    struct piece    tower   = {3, 0, 0, _artTower};
+    struct piece    queen   = {0, 0, 0, _artQueen};
+    struct piece    bishop  = {1, 0, 0, _artBishop};
+    struct piece    tower   = {2, 0, 0, _artTower};
+    struct piece    horse   = {4, 0, 0, _artHorse};
 
     // Coloca as peças no tabuleiro
-    placeAllPieces(board, &queen, &bishop, &tower);
+    placeAllPieces(board, &queen, &bishop, &tower, &horse);
     
     printf("%s%s",  label[0], label[1]);
     
@@ -136,15 +152,15 @@ int main () {
         printf("%s%s%s", label[2], label[3], label[12]);
         scanf("%hd", &main.control);
         if (main.control == 1) {
-            printBoard(board, &queen, &bishop, &tower);
+            printBoard(board, &queen, &bishop, &tower, &horse);
         }
         else if (main.control == 2) {
             
-            printf("%s%s%s%s", label[4], label[5], label[6], label[7]);
+            printf("%s%s%s%s%s", label[4], label[5], label[6], label[7], label[14]);
             
             scanf("%hd", &main.dpiece);
         
-            if (main.dpiece > 0x0 && main.dpiece < 0x4) {
+            if (main.dpiece > 0x0 && main.dpiece < 0x5) {
                 printf("%s", label[8]);
                 scanf("%hd", &main.dxp);
         
@@ -154,9 +170,10 @@ int main () {
                     if ((main.dyp >= 0x0) && (main.dyp < 0x8)) {
                         struct piece *selectedPiece = NULL;
 
-                        if (main.dpiece == 1) selectedPiece = &queen;
+                        if      (main.dpiece == 1) selectedPiece = &queen;
                         else if (main.dpiece == 2) selectedPiece = &bishop;
                         else if (main.dpiece == 3) selectedPiece = &tower;
+                        else if (main.dpiece == 4) selectedPiece = &horse;
 
                         if (isValidMove(selectedPiece, main.dxp, main.dyp)) {      // Valida se o movimento é valido                      
                             movePiece(board, selectedPiece, &main.dxp, &main.dyp); // Move a peça
@@ -164,7 +181,7 @@ int main () {
                             scanf("%hd", &main.control);
                             if (main.control == 1) {
                                 // Imprime o tabuleiro
-                                printBoard(board, &queen, &bishop, &tower);
+                                printBoard(board, &queen, &bishop, &tower, &horse);
                             }
                         } 
                         else {
@@ -183,21 +200,26 @@ int main () {
     return (0);
 }
 // Coloca todas as peças em uma região padrão
-void placeAllPieces(int board[8][8], struct piece *queen, struct piece *bishop, struct piece *tower) {
+void placeAllPieces(int board[8][8], struct piece *queen, struct piece *bishop, struct piece *tower, struct piece *horse) {
     // Rainha na posição (0, 0)
     queen->xp = 0;
     queen->yp = 0;
     board[queen->xp][queen->yp] = queen->type;
 
-    // Bispo na posição (1, 1)
+    // Bispo na posição (1, 0)
     bishop->xp = 1;
     bishop->yp = 0;
     board[bishop->xp][bishop->yp] = bishop->type;
 
-    // Torre na posição (2, 2)
+    // Torre na posição (2, 0)
     tower->xp = 2;
     tower->yp = 0;
     board[tower->xp][tower->yp] = tower->type;
+
+    // Cavalo na posição (3, 0)
+    horse->xp = 3;
+    horse->yp = 0;
+    board[horse->xp][horse->yp] = horse->type;
 }
 // Move a peça
 void movePiece(int board[8][8], struct piece *p, short int *newX, short int *newY) {
@@ -211,7 +233,7 @@ void movePiece(int board[8][8], struct piece *p, short int *newX, short int *new
     board[*newX][*newY] = p->type;
 }
 // Printa o tabuleiro
-void printBoard(int board[8][8], struct piece *queen, struct piece *bishop, struct piece *tower) {
+void printBoard(int board[8][8], struct piece *queen, struct piece *bishop, struct piece *tower, struct piece *horse) {
     /*
         Talvez essa seja a logica mais complexa desse programa deixa eu explicar
         Imagine um plano cartesiano em que corresponda à:
@@ -255,6 +277,7 @@ void printBoard(int board[8][8], struct piece *queen, struct piece *bishop, stru
                 if (queen->xp == x && queen->yp == y) p = queen;
                 else if (bishop->xp == x && bishop->yp == y) p = bishop;
                 else if (tower->xp == x && tower->yp == y) p = tower;
+                else if (horse->xp == x && horse->yp == y) p = horse;
 
                 if (p != NULL) {
                     printf("%s", p->art[line]);
@@ -281,6 +304,8 @@ short int isValidMove(struct piece *p, short int newX, short int newY) {
             return sabs(dx) == sabs(dy);
         case 3: // Torre
             return (dx == 0 || dy == 0);
+        case 4: // Cavalo
+            return ( (sabs(dx) == 2 && sabs(dy) == 1) || (sabs(dx) == 1 && sabs(dy) == 2) );  
         default:
             return 0;
     }
