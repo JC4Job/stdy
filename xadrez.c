@@ -18,6 +18,10 @@
     Testei utilizando um console da maquina virtual com SSH do programa Putty.
     Se fizer nas mesmas condições o tabuleiro vai ficar bonito e elegante.
 
+    Atenção:
+        Sei que a proposta seria utilizar os tipos especificos de loops, mas coloquei no codigo os conceitos,
+        mesmo que não utilizados diretamente
+        
     Espero que gostem! :D
 */
 
@@ -111,6 +115,9 @@ void placeAllPieces(int board[8][8], struct piece *queen, struct piece *bishop, 
 void printBoard(int board[8][8], struct piece *queen, struct piece *bishop, struct piece *tower);
 short int isValidMove(struct piece *p, short int newX, short int newY);
 short int sabs(short int d);
+void exemploFor();
+void exemploWhile();
+void exemploDoWhile();
 
 // Logica principal
 int main () {
@@ -281,4 +288,26 @@ short int isValidMove(struct piece *p, short int newX, short int newY) {
 // Implementação do math abs para short int
 short int sabs(short int d) {
     return d < 0 ? -d : d;
+}
+
+void _exemploFor() {
+    for (int i = 0; i < 5; i++) {
+        printf("Exemplo FOR: passo %d\n", i);
+    }
+}
+
+void exemploWhile() {
+    int i = 0;
+    while (i < 5) {
+        printf("Exemplo WHILE: passo %d\n", i);
+        i++;
+    }
+}
+
+void exemploDoWhile() {
+    int i = 0;
+    do {
+        printf("Exemplo DO-WHILE: passo %d\n", i);
+        i++;
+    } while (i < 5);
 }
