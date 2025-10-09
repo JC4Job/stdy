@@ -1,9 +1,42 @@
+/*
+    Desafio de batalha naval da Estácio.
+
+    Atenção !!!
+    
+      Foi compilado e testado em uma maquina virtual Linux Ubuntu Server, e foi utilizado o terminal em fullscreen a tela fica melhor.
+      E também não vai quebrar a cadeia de caracteres na representação grafica do programa.
+
+      Um grafico 2D baseado em text art ASCII.
+
+    Conceitos abordados, matriz, estrutura, vetor de estrutura, "variavel" pre precessor, conceitos de ifndef def, ponteiros
+    números hexadecimal no programa diretamente, dicionários, menu interativo, algumas validações elegantes.
+
+    Resumindo um programa simples e uma solução elegante.
+
+    Utilizei alguns dos conceitos que já fiz no xadrez e apliquei nesse também similarmente 
+    devido a matriz então o printar do board é a mesma coisa.
+    funçao de mover a peça é muito similar também quase a mesma coisa.
+    Tem algumas diferenças no layout e o conceito de dicionário e similar fiz bem modular então consegui aproveitar a logica de muita coisa
+    dos desafios antigos.
+
+    Espero que os avaliadores gostem do programa!
+
+*/
+
 #include <stdio.h>
 
+// Algumas constantes pre processamento
 #ifndef MAX_SHIPS
 #define MAX_SHIPS 0x8
 #endif
+#ifndef MAX_GRIDCELL
+#define MAX_GRIDCELL 0xa
+#endif
+#ifndef MAX_LINEART
+#define MAX_LINEART 0x5
+#endif
 
+// Dicionário das saidas de texto
 char label[20][200]             = {
                                     "Bem vindo ao trabalho de batalha naval para Estácio.\n",                               //0
                                     "Utilize os controles numéricos para navegar entre as opções.\n",                       //1
@@ -21,14 +54,16 @@ char label[20][200]             = {
                                     "Para Octaedro: 3\n",                                                                   //13
                                     "Para atribuir uma formação: 3\n",                                                      //14
                                     };
-char _artShip[5][32] = {
+
+// Padrão das artes em text art
+char _artShip[MAX_LINEART][32] = {
     "________________",
     "|     _/_/_    |",
     "|____/_____|__ |",
     "|l============||",
     "________________",
 };
-char _artBlank[5][32] = {
+char _artBlank[MAX_LINEART][32] = {
     "________________",
     "|    ~~ ~~~   ~|",
     "|~ ~~~~  ~~  ~~|",
@@ -36,6 +71,7 @@ char _artBlank[5][32] = {
     "________________",
 };
 
+// Struct para o navio e as ações da rotina principal
 struct ship {
     short int id;             // identificador unico de cada navio
     short int xp;             // posição atual no plano do eixo x
@@ -52,15 +88,15 @@ struct action {
 
 
 // Prototipos
-void movePiece(int board[10][10], struct ship *p, short int *newX, short int *newY);
-void placeAllPieces(int board[10][10], struct ship *p);
-void printBoard(struct ship *p);
-void shipFormation(int board[10][10], struct ship *p, short int *type);
-short int sabs(short int d);
+void movePiece(int board[MAX_GRIDCELL][MAX_GRIDCELL], struct ship *p, short int *newX, short int *newY); // move uma peça
+void placeAllPieces(int board[MAX_GRIDCELL][MAX_GRIDCELL], struct ship *p); // coloca todas as peças em uma posição padrão
+void printBoard(struct ship *p);  // faz o print da grid
+void shipFormation(int board[MAX_GRIDCELL][MAX_GRIDCELL], struct ship *p, short int *type); // faz a formação dos navios conforme seu tipo
+short int sabs(short int d); // remanecente do outro desafio de xadrez que imaginei que fosse utilizar
 
 // Logica principal
 int main () {
-    int board[10][10]       = {};
+    int board[MAX_GRIDCELL][MAX_GRIDCELL]       = {};
     struct action   main;
     struct ship     ships[MAX_SHIPS];
 
@@ -72,26 +108,32 @@ int main () {
     do {
         printf("%s%s%s%s", label[2], label[3], label[9], label[14]);
         scanf("%hd", &main.control);
+        
+        // Veja o controle se deseja printar o tabuleiro
         if (main.control == 0x1) {
             printBoard(ships);
         }
+        // Inicia o processo de perguntar qual peça movimentar
         else if (main.control == 0x2) {
             printf("%s", label[4]);            
             scanf("%hd", &main.dship);
         
-            if (main.dship >= 0x0 && main.dship < 0xa) {
+            // qual peça deseja movimentar
+            if (main.dship >= 0x0 && main.dship < MAX_GRIDCELL) {
                 printf("%s", label[5]);
                 scanf("%hd", &main.dxp);
-        
-                if ((main.dxp >= 0x0) && (main.dxp < 0xa)) {
+                
+                //  pega as coordenadas da matriz eixo X
+                if ((main.dxp >= 0x0) && (main.dxp < MAX_GRIDCELL)) {
                     printf("%s", label[6]);
                     scanf("%hd", &main.dyp);
                     
-                    if ((main.dyp >= 0x0) && (main.dyp < 0xa)) {
+                    //  pega as coordenadas da matriz eixo Y
+                    if ((main.dyp >= 0x0) && (main.dyp < MAX_GRIDCELL)) {
                         movePiece(board, &ships[main.dship], &main.dxp, &main.dyp); // Move a peça
                         printf("%s", label[9]);
-                        scanf("%hd", &main.control);
-                        if (main.control == 1) {
+                        scanf("%hd", &main.control); // Busca proximo controle principal
+                        if (main.control == 0x1) {
                             // Imprime o tabuleiro
                             printBoard(ships);
                         }
@@ -99,15 +141,18 @@ int main () {
                 }
             }
         }
+        // Processo de formação dos navios
         else if (main.control == 0x3) {
             printf("%s%s%s%s", label[10], label[11], label[12], label[13]);
             scanf("%hd", &main.ftype);
             
+            // valida se está dentro dos parametros esperados            
             if  (main.ftype > 0x0 && main.ftype <= 0x3) {
+                // faz a formação dos navios
                 shipFormation(board, ships, &main.ftype);
                 printf("%s", label[9]);
-                scanf("%hd", &main.control);
-                if (main.control == 1) {
+                scanf("%hd", &main.control); // Busca proximo controle principal
+                if (main.control == 0x1) {
                     // Imprime o tabuleiro
                     printBoard(ships);
                 }
@@ -117,7 +162,8 @@ int main () {
     return (0x0);
 }
 // Coloca todas as peças em uma região padrão
-void placeAllPieces(int board[10][10], struct ship *p) {
+void placeAllPieces(int board[MAX_GRIDCELL][MAX_GRIDCELL], struct ship *p) {
+    // busca o vetor de navios e coloca eles em uma posição inicial    
     for (int i = 0x0; i < MAX_SHIPS; i++) {
         p[i].id = i;
         p[i].xp = i;
@@ -127,7 +173,7 @@ void placeAllPieces(int board[10][10], struct ship *p) {
     }
 }
 // Move a peça
-void movePiece(int board[10][10], struct ship *p, short int *newX, short int *newY) {
+void movePiece(int board[MAX_GRIDCELL][MAX_GRIDCELL], struct ship *p, short int *newX, short int *newY) {
     // Remove da posição anterior
     board[p->xp][p->yp] = 0x0;
 
@@ -140,9 +186,9 @@ void movePiece(int board[10][10], struct ship *p, short int *newX, short int *ne
 // Printa o tabuleiro
 void printBoard(struct ship *p) {
     // printa de baixo para cima
-    for (int y = 0xa; y >= 0x0; y--) {
-        for (int line = 0x0; line < 0x5; line++) { // cada navio tem 5 linhas
-            for (int x = 0x0; x < 0xa; x++) {     // cada uma das colunas
+    for (int y = MAX_GRIDCELL; y >= 0x0; y--) {
+        for (int line = 0x0; line < MAX_LINEART; line++) { // cada navio tem 5 linhas
+            for (int x = 0x0; x < MAX_GRIDCELL; x++) {     // cada uma das colunas
                 struct ship *ss = NULL;
                 // Procura o navio em sua posição (x,y)
                 for (int i = 0x0; i < MAX_SHIPS; i++) {
@@ -162,13 +208,40 @@ void printBoard(struct ship *p) {
     }
 }
 // Faz a formação desejada
-void shipFormation(int board[10][10], struct ship *p, short int *type) {
+void shipFormation(int board[MAX_GRIDCELL][MAX_GRIDCELL], struct ship *p, short int *type) {
     // limpa toda a formação do tabuleiro
-    for (int x = 0; x < 10; x++)
-        for (int y = 0; y < 10; y++)
-            board[x][y] = 0;
+    for (int x = 0x0; x < MAX_GRIDCELL; x++)
+        for (int y = 0x0; y < MAX_GRIDCELL; y++)
+            board[x][y] = 0x0;
 
-    short int h1[10][10] = {
+    /*
+        Define uma matriz de habilidades todas de cabeça para baixo.
+        Pois o print da tela é feito de baixo para cima no loop, logo eu inverti a ordem das coisas para 
+        sempre ele mostrar a posição do eixo (x,y) como aprendemos no ginasio com o plano.
+        
+        5|
+        4|
+        3|
+        2|
+        1|__|__||__||__||__|    
+          1  2   3   4   5
+        
+        ele sempre printa:
+        
+        1|
+        2|
+        3|
+        4|
+        5|__|__||__||__||__|    
+          1  2   3   4   5
+        
+        então invertemos para sempre ele colocar o 0 em baixo pois não existe - x tela ou -y de forma real
+        sempre começa positiva no monitor, logo os eixos do centro são considerados em calculo, como -x ou -y da posição real
+        da matriz
+
+    */
+    // Cone
+    short int h1[MAX_GRIDCELL][MAX_GRIDCELL] = {
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -180,7 +253,8 @@ void shipFormation(int board[10][10], struct ship *p, short int *type) {
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
     };
-    short int h2[10][10] = {
+    // Cruz
+    short int h2[MAX_GRIDCELL][MAX_GRIDCELL] = {
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
@@ -192,7 +266,8 @@ void shipFormation(int board[10][10], struct ship *p, short int *type) {
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
     };
-    short int h3[10][10] = {
+    // Octaedro
+    short int h3[MAX_GRIDCELL][MAX_GRIDCELL] = {
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -204,35 +279,41 @@ void shipFormation(int board[10][10], struct ship *p, short int *type) {
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
     };
+    // Valida cada tipo de habilidade e manda buscar de uma matriz especifica
     switch(*type) {
         case 0x1:
-            for (int i = 0; i < MAX_SHIPS; i++) {
-                int placed = 0;
-                for (int xaxis = 0x0; xaxis < 0xa && !placed; xaxis++) {
-                    for (int yaxis = 0x0; yaxis < 0xa; yaxis++) {
-                        if (h1[xaxis][yaxis] == 1) {
+            for (int i = 0x0; i < MAX_SHIPS; i++) {
+                // Variavel de controle para saber se ele já moveu esse navio
+                int placed = 0x0;
+                // Varre o loop enquanto não moveu na posição correta
+                for (int xaxis = 0x0; xaxis < MAX_GRIDCELL && !placed; xaxis++) {
+                    for (int yaxis = 0x0; yaxis < MAX_GRIDCELL; yaxis++) {
+                        // Verifica se a matriz tem 1 e se tiver um ele precisa colocar um navio nessa posição
+                        if (h1[xaxis][yaxis] == 0x1) {
+                            // Inverti os eixos para corresponder o que já expliquei acima;
                             short int nx = yaxis;
                             short int ny = xaxis;
                             movePiece(board, &p[i], &nx, &ny);
-                            h1[xaxis][yaxis] = 0; // marca que foi utilizado liberando os espaços
-                            placed = 1;
+                            h1[xaxis][yaxis] = 0x0; // marca que foi utilizado liberando os espaços
+                            placed = 0x1;
                             break;
                         }
                     }
                 }
             }
             break;
+        // Em diante a logica é a mesma então não tem necessidade de exemplificar a unica diferença seria a matriz de referência
         case 0x2:
-            for (int i = 0; i < MAX_SHIPS; i++) {
-                int placed = 0;
-                for (int xaxis = 0x0; xaxis < 0xa && !placed; xaxis++) {
-                    for (int yaxis = 0x0; yaxis < 0xa; yaxis++) {
-                        if (h2[xaxis][yaxis] == 1) {
+            for (int i = 0x0; i < MAX_SHIPS; i++) {
+                int placed = 0x0;
+                for (int xaxis = 0x0; xaxis < MAX_GRIDCELL && !placed; xaxis++) {
+                    for (int yaxis = 0x0; yaxis < MAX_GRIDCELL; yaxis++) {
+                        if (h2[xaxis][yaxis] == 0x1) {
                             short int nx = yaxis;
                             short int ny = xaxis;
                             movePiece(board, &p[i], &nx, &ny);
-                            h2[xaxis][yaxis] = 0; // marca que foi utilizado liberando os espaços
-                            placed = 1;
+                            h2[xaxis][yaxis] = 0x0; // marca que foi utilizado liberando os espaços
+                            placed = 0x1;
                             break;
                         }
                     }
@@ -240,16 +321,16 @@ void shipFormation(int board[10][10], struct ship *p, short int *type) {
             }
             break;        
         case 0x3:
-            for (int i = 0; i < MAX_SHIPS; i++) {
-                int placed = 0;
-                for (int xaxis = 0x0; xaxis < 0xa && !placed; xaxis++) {
-                    for (int yaxis = 0x0; yaxis < 0xa; yaxis++) {
-                        if (h3[xaxis][yaxis] == 1) {
+            for (int i = 0x0; i < MAX_SHIPS; i++) {
+                int placed = 0x0;
+                for (int xaxis = 0x0; xaxis < MAX_GRIDCELL && !placed; xaxis++) {
+                    for (int yaxis = 0x0; yaxis < MAX_GRIDCELL; yaxis++) {
+                        if (h3[xaxis][yaxis] == 0x1) {
                             short int nx = yaxis;
                             short int ny = xaxis;
                             movePiece(board, &p[i], &nx, &ny);
-                            h3[xaxis][yaxis] = 0; // marca que foi utilizado liberando os espaços
-                            placed = 1;
+                            h3[xaxis][yaxis] = 0x0; // marca que foi utilizado liberando os espaços
+                            placed = 0x1;
                             break;
                         }
                     }
