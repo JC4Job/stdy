@@ -42,7 +42,7 @@ char label[20][200]             = {
                                     "Utilize os controles numéricos para navegar entre as opções.\n",                       //1
                                     "Para sair do jogo: 0\n",                                                               //2
                                     "Para mover uma peça: 2\n",                                                             //3
-                                    "Qual navio gostaria de mover?\n",                                                      //4
+                                    "Qual navio gostaria de mover? Valores entre (0 e 7)\n",                                                      //4
                                     "Qual casa gostaria de mover a peça no eixo X? Valores posicionais entre (0 e 9)\n",    //5
                                     "Qual casa gostaria de mover a peça no eixo Y? Valores posicionais entre (0 e 9)\n",    //6
                                     "Gostaria de pintar o tabuleiro?\n",                                                    //7
