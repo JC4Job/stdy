@@ -92,7 +92,6 @@ void movePiece(int board[MAX_GRIDCELL][MAX_GRIDCELL], struct ship *p, short int 
 void placeAllPieces(int board[MAX_GRIDCELL][MAX_GRIDCELL], struct ship *p); // coloca todas as peças em uma posição padrão
 void printBoard(struct ship *p);  // faz o print da grid
 void shipFormation(int board[MAX_GRIDCELL][MAX_GRIDCELL], struct ship *p, short int *type); // faz a formação dos navios conforme seu tipo
-short int sabs(short int d); // remanecente do outro desafio de xadrez que imaginei que fosse utilizar
 
 // Logica principal
 int main () {
